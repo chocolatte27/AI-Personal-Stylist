@@ -1,9 +1,5 @@
 """
 AI Personal Stylist — Flask backend
-------------------------------------
-Reconstructed from the project report (AI Personal Stylist / Smart Wardrobe
-Organizer) and the app.py screenshot supplied by the user.
-
 Setup:
   1. pip install -r requirements.txt
   2. Set your own keys as environment variables (see .env.example) —

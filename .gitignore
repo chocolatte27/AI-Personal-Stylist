@@ -1,0 +1,8 @@
+﻿.env
+__pycache__/
+*.pyc
+venv/
+.venv/
+wardrobe_data.json
+.DS_Store
+Thumbs.db

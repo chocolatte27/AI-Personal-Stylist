@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Personal Stylist — Your Personal Outfit Assistant</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">👗</span>
+    <div>
+      <div class="brand-title">AI Personal Stylist</div>
+      <div class="brand-subtitle">Your Personal Outfit Assistant</div>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="stylist">AI Stylist</button>
+    <button class="tab" data-tab="closet">My Closet</button>
+    <button class="tab" data-tab="insights">Insights</button>
+  </nav>
+</header>
+
+<main class="page">
+
+  <!-- ============ AI STYLIST TAB ============ -->
+  <section id="tab-stylist" class="tab-panel active">
+    <div class="stylist-grid">
+      <div class="card">
+        <h2>Tell me about your day</h2>
+
+        <div class="field">
+          <label>What's the occasion?</label>
+          <div class="pill-group" id="occasion-group">
+            <button class="pill" data-value="College">🎓 College</button>
+            <button class="pill" data-value="Work">💼 Work</button>
+            <button class="pill" data-value="Gym">🏋 Gym</button>
+            <button class="pill" data-value="Ethnic Event">🪔 Ethnic Event</button>
+            <button class="pill" data-value="Casual Out">☀️ Casual Out</button>
+            <button class="pill" data-value="Party">🎉 Party</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>How are you feeling?</label>
+          <div class="pill-group" id="mood-group">
+            <button class="pill" data-value="Relaxed">😌 Relaxed</button>
+            <button class="pill" data-value="Bold">⚡ Bold</button>
+            <button class="pill" data-value="Minimal">◻ Minimal</button>
+            <button class="pill" data-value="Traditional">🪭 Traditional</button>
+            <button class="pill" data-value="Playful">💕 Playful</button>
+            <button class="pill" data-value="Confident">🔥 Confident</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Your personal style preferences <span class="optional">(optional)</span></label>
+          <input type="text" id="preferences" placeholder="e.g. I love pastels, hate itchy fabrics, prefer loose fits...">
+        </div>
+
+        <div class="field">
+          <label>Weather</label>
+          <div class="weather-row">
+            <input type="text" id="city" placeholder="Enter your city for live weather">
+            <span class="or">or</span>
+            <input type="text" id="manual-weather" placeholder="Describe it manually (e.g. hot &amp; humid)">
+          </div>
+        </div>
+
+        <button id="get-outfit-btn" class="primary-btn">✨ Get My Outfit</button>
+      </div>
+
+      <div class="card result-card">
+        <div id="weather-badge" class="weather-badge hidden"></div>
+        <div id="result-empty" class="result-empty">
+          <div class="result-empty-icon">👠</div>
+          <h3>Your stylist is ready!</h3>
+          <p>Fill in your occasion and mood, then hit the button. I'll curate an outfit just for you.</p>
+        </div>
+        <div id="result-filled" class="result-filled hidden">
+          <h3>Here's your look ✨</h3>
+          <p id="outfit-text"></p>
+          <button id="try-another-btn" class="secondary-btn">Try another look →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MY CLOSET TAB ============ -->
+  <section id="tab-closet" class="tab-panel">
+    <div class="closet-header">
+      <h2>My Wardrobe</h2>
+      <button id="add-item-btn" class="primary-btn small">+ Add Item</button>
+    </div>
+
+    <div class="pill-group" id="category-filter">
+      <button class="pill active" data-value="All">All</button>
+      {% for c in categories %}
+      <button class="pill" data-value="{{ c }}">{{ c }}</button>
+      {% endfor %}
+    </div>
+
+    <div id="wardrobe-grid" class="wardrobe-grid"></div>
+  </section>
+
+  <!-- ============ INSIGHTS TAB ============ -->
+  <section id="tab-insights" class="tab-panel">
+    <h2>Wardrobe Insights</h2>
+    <div class="insights-grid" id="insights-grid">
+      <div class="card insight-card">
+        <h3>Most worn</h3>
+        <ul id="most-worn-list" class="bar-list"></ul>
+      </div>
+      <div class="card insight-card">
+        <h3>Underused pieces</h3>
+        <ul id="least-worn-list" class="bar-list"></ul>
+      </div>
+      <div class="card insight-card">
+        <h3>Never worn</h3>
+        <ul id="never-worn-list" class="chip-list"></ul>
+      </div>
+      <div class="card insight-card">
+        <h3>Wardrobe by category</h3>
+        <ul id="category-list" class="bar-list"></ul>
+      </div>
+      <div class="card insight-card stat-card">
+        <h3>Overview</h3>
+        <div class="stat-row"><span id="stat-total-items">0</span><label>Items in closet</label></div>
+        <div class="stat-row"><span id="stat-total-wears">0</span><label>Total times worn</label></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Add Item modal -->
+<div id="add-item-modal" class="modal hidden">
+  <div class="modal-card">
+    <h3>Add a new item</h3>
+    <label>Name</label>
+    <input type="text" id="new-item-name" placeholder="e.g. Green shacket">
+    <label>Category</label>
+    <select id="new-item-category">
+      {% for c in categories %}
+      <option value="{{ c }}">{{ c }}</option>
+      {% endfor %}
+    </select>
+    <label>Price <span class="optional">(optional, for cost-per-wear)</span></label>
+    <input type="number" id="new-item-price" placeholder="e.g. 1200">
+    <div class="modal-actions">
+      <button id="cancel-add-item" class="secondary-btn">Cancel</button>
+      <button id="confirm-add-item" class="primary-btn">Add to closet</button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
